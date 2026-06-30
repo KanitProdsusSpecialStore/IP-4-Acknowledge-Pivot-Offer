@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The CAN Bridge: Office Survival</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        :root {
+            --glass-bg: rgba(25, 30, 40, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --primary-color: #00d2ff;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --text-light: #f8f9fa;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            /* Background pegunungan untuk tema petualangan */
+            background: linear-gradient(rgba(10, 20, 30, 0.7), rgba(10, 20, 30, 0.7)), 
+                        url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover fixed;
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+
+        h1, h2, h3 { text-align: center; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        
+        p { line-height: 1.6; margin-bottom: 15px; }
+
+        /* BUTTONS */
+        button {
+            background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 198, 255, 0.4);
+            display: inline-block;
+        }
+        button:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0, 198, 255, 0.6); }
+        button:active { transform: translateY(1px); }
+        button:disabled { background: #555; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            box-shadow: none;
+        }
+        .btn-outline:hover { background: rgba(0, 210, 255, 0.1); }
+
+        /* SCREENS */
+        .screen { display: none; animation: fadeIn 0.5s ease-in-out; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* FORM */
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; }
+        .form-group input {
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.1); color: white; font-size: 1em; outline: none;
+        }
+        .form-group input:focus { border-color: var(--primary-color); background: rgba(255,255,255,0.2); }
+
+        /* HUD & PROGRESS */
+        .hud {
+            display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding: 15px; border-radius: 15px;
+        }
+        .progress-container { flex-grow: 1; margin: 0 20px; height: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; overflow: hidden; position: relative; min-width: 200px;}
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #f1c40f, #2ecc71); width: 0%; transition: width 0.5s ease; }
+        .stats { display: flex; gap: 20px; font-weight: bold; }
+        .badge-display { display: flex; gap: 5px; }
+        .badge-icon { width: 30px; height: 30px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8em; opacity: 0.3; transition: all 0.3s;}
+        .badge-icon.earned { opacity: 1; background: gold; color: #333; box-shadow: 0 0 10px gold;}
+
+        /* GAME GRID */
+        .grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; perspective: 1000px;
+        }
+        .card {
+            aspect-ratio: 3/4; background: transparent; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        .card.flip { transform: rotateY(180deg); }
+        .card.matched { visibility: hidden; opacity: 0; transition: visibility 0s 0.5s, opacity 0.5s; }
+        
+        .card-face {
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+            border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.3); font-size: 0.85em; border: 2px solid rgba(255,255,255,0.1);
+        }
+        .card-back {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            background-size: 200% 200%; animation: gradientBG 5s ease infinite;
+        }
+        .card-back::after { content: "⛰️"; font-size: 2.5em; opacity: 0.8; }
+        .card-front { transform: rotateY(180deg); overflow-y: auto; }
+        
+        .type-problem { background: rgba(231, 76, 60, 0.9); }
+        .type-solution { background: rgba(39, 174, 96, 0.9); }
+
+        .hint-text { font-size: 0.7em; opacity: 0.7; margin-bottom: 5px; font-weight: bold; }
+
+        @keyframes gradientBG { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
+
+        /* DEBRIEFING */
+        .feedback-list { text-align: left; margin-top: 20px; max-height: 400px; overflow-y: auto; padding-right: 10px; }
+        .feedback-item { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid var(--primary-color); }
+        .feedback-item .prob { color: #ff7675; font-weight: bold; margin-bottom: 5px;}
+        .feedback-item .sol { color: #55efc4; }
+
+        footer { text-align: center; padding: 20px; font-size: 0.8em; opacity: 0.6; margin-top: auto; }
+
+        .controls { position: fixed; top: 20px; right: 20px; z-index: 100; }
+        .controls button { padding: 8px 15px; font-size: 0.9em; border-radius: 8px; }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 600px) { 
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } 
+            .card-face { font-size: 0.7em; padding: 8px; }
+            .hud { flex-direction: column; gap: 10px; }
+            .progress-container { width: 100%; margin: 10px 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <button id="btn-audio" class="btn-outline" onclick="toggleAudio()">🔇 BGM Off</button>
+    </div>
+
+    <div class="container">
+        
+        <!-- SCREEN 1: GATEWAY -->
+        <div id="screen-gateway" class="screen active glass-panel">
+            <h1>⛰️ The CAN Bridge</h1>
+            <h3 style="color: var(--primary-color); font-weight: 400;">Office Survival Expedition</h3>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px; margin-bottom: 25px;">
+                <p style="font-style: italic; text-align: center;">"Mengapa kita sering terjebak dalam argumen panjang saat menolak permintaan rekan kerja? Bagaimana jika kita bisa tetap mematuhi aturan SOP, namun mengubah lawan bicara menjadi sekutu?"</p>
+            </div>
+
+            <div class="form-group">
+                <label for="playerName">Nama Explorer</label>
+                <input type="text" id="playerName" placeholder="Masukkan Nama Anda..." autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="playerNIK">NIK / ID Karyawan</label>
+                <input type="text" id="playerNIK" placeholder="Masukkan NIK Anda..." autocomplete="off">
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button onclick="goToBriefing()">Mulai Ekspedisi 🚀</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: BRIEFING & MATERI -->
+        <div id="screen-briefing" class="screen glass-panel">
+            <h2>📜 Mission Briefing</h2>
+            <p>Selamat datang, <span id="display-name" style="color: var(--primary-color); font-weight:bold;"></span>. Hari ini, meja Anda penuh dengan permintaan mendadak, keluhan, dan jalan buntu operasional.</p>
+            
+            <div style="text-align: left; margin: 20px 0;">
+                <h4 style="color: #f1c40f;">🗺️ Analogi Google Maps</h4>
+                <p>Saat satu jalan ditutup, Google Maps tidak mengatakan "Anda tidak bisa lewat sini, silakan matikan mesin". Sistem langsung mencari <strong>RUTE ALTERNATIF</strong>. Itulah mentalitas kita hari ini.</p>
+                
+                <h4 style="color: #55efc4; margin-top: 15px;">🌉 Metode A - P - O (Pivot to CAN)</h4>
+                <ul>
+                    <li><strong>[A] Acknowledge:</strong> Validasi perasaan/kebutuhan mereka agar merasa didengar.</li>
+                    <li><strong>[P] Pivot:</strong> Jelaskan batasan/fakta/SOP secara obyektif tanpa menyalahkan.</li>
+                    <li><strong>[O] Offer (The CAN):</strong> Tawarkan alternatif tindakan yang BISA dilakukan saat ini juga.</li>
+                </ul>
+            </div>
+
+            <div style="background: rgba(231, 76, 60, 0.2); padding: 15px; border-radius: 10px; border-left: 4px solid #e74c3c; margin-bottom: 20px; text-align: left;">
+                <strong>Objektif Game:</strong><br>
+                Cocokkan Kartu Merah (Jalan Buntu/Masalah) dengan Kartu Hijau (Solusi A-P-O). Hati-hati, setiap langkah salah akan mengurangi poin energi Anda!
+            </div>
+
+            <div style="text-align: center;">
+                <button onclick="startGame()">Siap! Terjun ke Lapangan 🧗‍♂️</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: CORE GAME -->
+        <div id="screen-game" class="screen">
+            <div class="hud glass-panel" style="margin-bottom: 20px; padding: 15px;">
+                <div class="stats">
+                    <div>Poin: <span id="score" style="color: #f1c40f;">0</span></div>
+                    <div>Langkah: <span id="moves">0</span></div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                    <div style="position: absolute; top:0; left:0; width:100%; text-align:center; font-size:0.7em; line-height: 15px; font-weight:bold;">Progress <span id="progress-text">0%</span></div>
+                </div>
+
+                <div class="badge-display">
+                    <div class="badge-icon" id="badge-1" title="Sherpa Junior (3 Pasang)">🥉</div>
+                    <div class="badge-icon" id="badge-2" title="Mountain Guide (6 Pasang)">🥈</div>
+                    <div class="badge-icon" id="badge-3" title="Summit Conqueror (10 Pasang)">🥇</div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-bottom: 15px;">
+                <button class="btn-outline" onclick="useHint()" id="btn-hint" style="font-size: 0.8em; padding: 5px 15px;">Gunakan Hint (-15 Poin)</button>
+            </div>
+
+            <div class="grid" id="game-grid">
+                <!-- Cards injected here -->
+            </div>
+        </div>
+
+        <!-- SCREEN 4: POST-ACTION DEBRIEF -->
+        <div id="screen-result" class="screen glass-panel">
+            <h2>🏆 Ekspedisi Selesai!</h2>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <h1 style="font-size: 4em; margin: 0; color: #f1c40f;" id="final-score">0</h1>
+                <p>Total Poin Akhir Anda</p>
+                <div id="reinforcement-msg" style="font-weight: bold; font-size: 1.2em; margin-top: 10px;"></div>
+            </div>
+
+            <h3 style="margin-top: 30px;">📋 Debriefing Lapangan</h3>
+            <p style="font-size: 0.9em; text-align:center;">Berikut adalah rekap bagaimana Anda mengubah jalan buntu menjadi Jembatan Alternatif hari ini:</p>
+            
+            <div class="feedback-list" id="feedback-list">
+                <!-- Feedback injected here -->
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button onclick="location.reload()">Selesaikan Modul & Main Lagi 🔄</button>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        Education & Training Dept. © 2026 | The CAN Bridge Gamification Module
+    </footer>
+
+    <script>
+        /* =========================================
+           DATA MATERI (10 PASANG SKENARIO)
+           Berdasarkan Teori Customer Service Survival Kit (Acknowledge-Pivot-Offer)
+           ========================================= */
+        const cardData = [
+            { id: 1, type: 'problem', text: "SOP melarang peminjaman proyektor ke luar gedung." },
+            { id: 1, type: 'solution', text: "[A] Saya ngerti alat ini krusial untuk event.\n[P] Aturan asuransi tidak cover alat di luar gedung.\n[O] Tapi saya BISA pesankan dari vendor rekanan kita segera." },
+            
+            { id: 2, type: 'problem', text: "Permintaan laporan mendadak untuk meeting 10 menit lagi." },
+            { id: 2, type: 'solution', text: "[A] Laporan ini pasti ditunggu Direksi sekarang.\n[P] Butuh 2 jam tarikan sistem untuk data lengkap.\n[O] Yang BISA saya siapkan dalam 10 menit adalah Executive Summary-nya." },
+            
+            { id: 3, type: 'problem', text: "Budget training departemenmu sudah habis bulan ini." },
+            { id: 3, type: 'solution', text: "[A] Training ini sangat penting untuk skill tim.\n[P] Kuota budget bulan ini statusnya sudah limit.\n[O] Saya BISA amankan kuota untuk tim Anda di batch pertama awal bulan depan." },
+            
+            { id: 4, type: 'problem', text: "Sistem HRIS down, tidak bisa input cuti mendesak." },
+            { id: 4, type: 'solution', text: "[A] Cuti ini pasti sudah Anda rencanakan jauh hari.\n[P] Sistem server sedang maintenance tak terduga.\n[O] Silakan isi form manual ini, saya BISA inputkan prioritas setelah sistem UP." },
+            
+            { id: 5, type: 'problem', text: "Ruang meeting utama sudah di-booking seharian." },
+            { id: 5, type: 'solution', text: "[A] Meeting Anda melibatkan klien VIP yang penting.\n[P] Sayangnya ruang utama full booked dari pagi.\n[O] Saya BISA siapkan ruang Executive di lantai 2 yang fasilitasnya setara." },
+            
+            { id: 6, type: 'problem', text: "Saya tidak punya wewenang approve diskon 20%." },
+            { id: 6, type: 'solution', text: "[A] Diskon ini kunci untuk deal dengan klien besar.\n[P] Limit approval sistem saya maksimal hanya 10%.\n[O] Saya BISA bantu eskalasikan ini ke Direktur sekarang agar diproses cepat." },
+            
+            { id: 7, type: 'problem', text: "Barang suvenir tipe A untuk tamu habis di gudang." },
+            { id: 7, type: 'solution', text: "[A] Tamu VIP harus mendapat impresi terbaik.\n[P] Namun stok suvenir tipe A sedang kosong di sistem.\n[O] Kita BISA berikan suvenir tipe B edisi premium, saya ambilkan sekarang." },
+            
+            { id: 8, type: 'problem', text: "Tidak bisa reimburse cash advance tanpa struk asli." },
+            { id: 8, type: 'solution', text: "[A] Saya tahu Anda sudah pakai uang pribadi untuk ini.\n[P] SOP audit Finance mewajibkan bukti fisik/asli.\n[O] Jika struk hilang, Anda BISA lampirkan mutasi bank + form kehilangan internal." },
+            
+            { id: 9, type: 'problem', text: "Tim IT kami overload, tidak bisa cek PC Anda hari ini." },
+            { id: 9, type: 'solution', text: "[A] Tanpa PC, kerjaan harian Anda pasti terhambat.\n[P] Semua teknisi sedang menangani server down.\n[O] Saya BISA pinjamkan laptop spare di loker agar Anda bisa kerja sementara." },
+            
+            { id: 10, type: 'problem', text: "Desainer full, tidak bisa kerjakan revisi hari ini." },
+            { id: 10, type: 'solution', text: "[A] Revisi brosur ini butuh cepat untuk naik cetak besok.\n[P] Tim internal sedang full capacity hari ini.\n[O] Saya BISA alokasikan ke freelancer darurat kami untuk dikerjakan malam ini." }
+        ];
+
+        /* =========================================
+           STATE MANAJEMEN GAME
+           ========================================= */
+        let playerName = "";
+        let playerNIK = "";
+        let cards = [];
+        let firstCard = null, secondCard = null;
+        let lockBoard = false;
+        let matches = 0;
+        let moves = 0;
+        let score = 0;
+        const totalPairs = 10;
+
+        // Audio State
+        let audioCtx;
+        let isAudioPlaying = false;
+        let masterGain;
+        let nextNoteTime = 0;
+        let current16thNote = 0;
+        let chordIndex = 0;
+        let schedulerTimer;
+
+        // Chords Progression (Am, F, C, G) - MIDI note numbers
+        const chords = [
+            [57, 60, 64], // Am (A, C, E)
+            [53, 57, 60], // F (F, A, C)
+            [48, 52, 55], // C (C, E, G)
+            [55, 59, 62]  // G (G, B, D)
+        ];
+
+        /* =========================================
+           FUNGSI UI & ALUR
+           ========================================= */
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function goToBriefing() {
+            playerName = document.getElementById('playerName').value.trim();
+            playerNIK = document.getElementById('playerNIK').value.trim();
+            
+            if(!playerName || !playerNIK) {
+                alert("Mohon masukkan Nama dan NIK Anda untuk memulai ekspedisi.");
+                return;
+            }
+            
+            document.getElementById('display-name').innerText = playerName;
+            
+            // Inisialisasi Audio saat interaksi pertama user (Kebijakan Browser)
+            if(!audioCtx) initAudio();
+            if(!isAudioPlaying) toggleAudio(); // Start BGM
+
+            switchScreen('screen-briefing');
+        }
+
+        function startGame() {
+            switchScreen('screen-game');
+            initBoard();
+        }
+
+        /* =========================================
+           CORE MECHANICS: MATCHING PAIRS
+           ========================================= */
+        function initBoard() {
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '';
+            
+            // Acak kartu
+            cards = [...cardData];
+            cards.sort(() => 0.5 - Math.random());
+
+            cards.forEach(item => {
+                const cardEl = document.createElement('div');
+                cardEl.classList.add('card');
+                cardEl.dataset.id = item.id;
+                cardEl.dataset.type = item.type;
+
+                const typeClass = item.type === 'problem' ? 'type-problem' : 'type-solution';
+                const hintTitle = item.type === 'problem' ? '⚠️ JALAN BUNTU' : '✅ OPSI PENYELAMATAN (A-P-O)';
+
+                cardEl.innerHTML = `
+                    <div class="card-face card-front ${typeClass}">
+                        <div class="hint-text">${hintTitle}</div>
+                        <div>${item.text.replace(/\n/g, '<br><br>')}</div>
+                    </div>
+                    <div class="card-face card-back"></div>
+                `;
+
+                cardEl.addEventListener('click', flipCard);
+                grid.appendChild(cardEl);
+            });
+
+            updateHUD();
+        }
+
+        function flipCard() {
+            if (lockBoard) return;
+            if (this === firstCard) return;
+            if (this.classList.contains('matched')) return;
+
+            this.classList.add('flip');
+
+            if (!firstCard) {
+                firstCard = this;
+                return;
+            }
+
+            secondCard = this;
+            moves++;
+            checkForMatch();
+        }
+
+        function checkForMatch() {
+            lockBoard = true;
+            let isMatch = firstCard.dataset.id === secondCard.dataset.id && 
+                          firstCard.dataset.type !== secondCard.dataset.type;
+
+            if (isMatch) {
+                handleMatch();
+            } else {
+                handleMismatch();
+            }
+        }
+
+        function handleMatch() {
+            playSFX('correct');
+            score += 20; // Poin besar karena 10 pasang cukup sulit
+            matches++;
+            
+            setTimeout(() => {
+                firstCard.classList.add('matched');
+                secondCard.classList.add('matched');
+                resetBoard();
+                updateHUD();
+                checkWin();
+            }, 1000); // Tahan sebentar agar bisa dibaca
+        }
+
+        function handleMismatch() {
+            playSFX('wrong');
+            score = Math.max(0, score - 5); // Penalti
+            
+            setTimeout(() => {
+                firstCard.classList.remove('flip');
+                secondCard.classList.remove('flip');
+                resetBoard();
+                updateHUD();
+            }, 1500);
+        }
+
+        function resetBoard() {
+            [firstCard, secondCard, lockBoard] = [null, null, false];
+        }
+
+        function updateHUD() {
+            document.getElementById('score').innerText = score;
+            document.getElementById('moves').innerText = moves;
+            
+            const pct = (matches / totalPairs) * 100;
+            document.getElementById('progress-bar').style.width = pct + '%';
+            document.getElementById('progress-text').innerText = Math.round(pct) + '%';
+
+            // Badges
+            if (matches >= 3) document.getElementById('badge-1').classList.add('earned');
+            if (matches >= 6) document.getElementById('badge-2').classList.add('earned');
+            if (matches >= 10) document.getElementById('badge-3').classList.add('earned');
+        }
+
+        function useHint() {
+            if (score < 15) {
+                alert("Poin Anda tidak cukup untuk Hint. Butuh 15 Poin.");
+                return;
+            }
+            if (lockBoard) return;
+            
+            score -= 15;
+            updateHUD();
+            
+            // Intip sebentar (Buka kartu yang belum match selama 1.5 detik)
+            lockBoard = true;
+            const allCards = document.querySelectorAll('.card:not(.matched):not(.flip)');
+            allCards.forEach(c => c.classList.add('flip'));
+            
+            setTimeout(() => {
+                allCards.forEach(c => c.classList.remove('flip'));
+                lockBoard = false;
+            }, 1500);
+        }
+
+        function checkWin() {
+            if (matches === totalPairs) {
+                setTimeout(showDebrief, 1000);
+            }
+        }
+
+        function showDebrief() {
+            switchScreen('screen-result');
+            
+            // Hentikan BGM pelan-pelan
+            if(masterGain) {
+                masterGain.gain.setTargetAtTime(0, audioCtx.currentTime, 2);
+                setTimeout(() => { toggleAudio(); }, 2000);
+            }
+            playSFX('win');
+
+            document.getElementById('final-score').innerText = score;
+            
+            const msgEl = document.getElementById('reinforcement-msg');
+            if(score > 150) {
+                msgEl.innerText = "Luar Biasa! Anda adalah problem solver sejati dan negosiator ulung.";
+                msgEl.style.color = "#2ecc71";
+            } else if (score > 80) {
+                msgEl.innerText = "Bagus! Anda mulai terbiasa membangun jembatan, pertahankan fokus 'The CAN'.";
+                msgEl.style.color = "#f1c40f";
+            } else {
+                msgEl.innerText = "Terus Berlatih! Refleks birokrasi memang kuat, tapi Anda di jalan yang benar.";
+                msgEl.style.color = "#e74c3c";
+            }
+
+            generateFeedbackList();
+        }
+
+        function generateFeedbackList() {
+            const listEl = document.getElementById('feedback-list');
+            listEl.innerHTML = '';
+            
+            // Kelompokkan berdasarkan ID untuk di render di akhir
+            for(let i=1; i<=totalPairs; i++) {
+                let prob = cardData.find(c => c.id === i && c.type === 'problem').text;
+                let sol = cardData.find(c => c.id === i && c.type === 'solution').text;
+                
+                listEl.innerHTML += `
+                    <div class="feedback-item">
+                        <div class="prob">🛑 Jalan Buntu: <br><span style="font-weight:normal; color:#ddd;">"${prob}"</span></div>
+                        <div class="sol" style="margin-top:10px;">✅ Alternatif (A-P-O): <br><span style="font-weight:normal; color:#ddd;">"${sol.replace(/\n/g, '<br>')}"</span></div>
+                    </div>
+                `;
+            }
+        }
+
+        /* =========================================
+           WEB AUDIO API ENGINE (BGM & SFX)
+           ========================================= */
+        function mToF(midiNote) {
+            return 440 * Math.pow(2, (midiNote - 69) / 12);
+        }
+
+        function initAudio() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+            masterGain = audioCtx.createGain();
+            masterGain.gain.value = 0.3; // Volume Master
+            masterGain.connect(audioCtx.destination);
+        }
+
+        function scheduleAudio() {
+            while (nextNoteTime < audioCtx.currentTime + 0.1) {
+                playStep(current16thNote, nextNoteTime);
+                nextNoteTime += 0.2; // Tempo (sekitar 75 BPM)
+                current16thNote++;
+                if (current16thNote === 16) {
+                    current16thNote = 0;
+                    chordIndex = (chordIndex + 1) % chords.length;
+                }
+            }
+            schedulerTimer = setTimeout(scheduleAudio, 25);
+        }
+
+        function playStep(step, time) {
+            if(!isAudioPlaying) return;
+            const currentChord = chords[chordIndex];
+
+            // Instrumen 1: Pad (Setiap ketukan pertama dalam bar)
+            if (step === 0) {
+                currentChord.forEach(note => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = mToF(note);
+                    
+                    gain.gain.setValueAtTime(0, time);
+                    gain.gain.linearRampToValueAtTime(0.2, time + 1);
+                    gain.gain.linearRampToValueAtTime(0, time + 3.2);
+                    
+                    osc.connect(gain);
+                    gain.connect(masterGain);
+                    osc.start(time);
+                    osc.stop(time + 3.2);
+                });
+            }
+
+            // Instrumen 2: Bass (Ketukan 0 dan 8)
+            if (step === 0 || step === 8) {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                const filter = audioCtx.createBiquadFilter();
+                
+                osc.type = 'triangle';
+                osc.frequency.value = mToF(currentChord[0] - 12); // Turun 1 oktaf
+                
+                filter.type = 'lowpass';
+                filter.frequency.value = 300;
+                
+                gain.gain.setValueAtTime(0, time);
+                gain.gain.linearRampToValueAtTime(0.4, time + 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.01, time + 1.5);
+                
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(masterGain);
+                osc.start(time);
+                osc.stop(time + 1.5);
+            }
+
+            // Instrumen 3: Arp (Pola sinkopasi)
+            if (step % 4 === 0 || step === 7 || step === 14) {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                // Pilih nada dari chord (acak sedikit)
+                const note = currentChord[step % 3] + 12; // Naik 1 oktaf
+                osc.type = 'square';
+                osc.frequency.value = mToF(note);
+                
+                gain.gain.setValueAtTime(0, time);
+                gain.gain.linearRampToValueAtTime(0.05, time + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.001, time + 0.3);
+                
+                osc.connect(gain);
+                gain.connect(masterGain);
+                osc.start(time);
+                osc.stop(time + 0.3);
+            }
+        }
+
+        function toggleAudio() {
+            if(!audioCtx) return;
+            const btn = document.getElementById('btn-audio');
+            if (isAudioPlaying) {
+                isAudioPlaying = false;
+                clearTimeout(schedulerTimer);
+                btn.innerText = "🔇 BGM Off";
+                btn.style.color = "var(--danger-color)";
+                btn.style.borderColor = "var(--danger-color)";
+            } else {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                isAudioPlaying = true;
+                nextNoteTime = audioCtx.currentTime + 0.1;
+                scheduleAudio();
+                btn.innerText = "🔊 BGM On";
+                btn.style.color = "var(--success-color)";
+                btn.style.borderColor = "var(--success-color)";
+            }
+        }
+
+        function playSFX(type) {
+            if (!audioCtx) return;
+            const t = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(masterGain);
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, t);
+                osc.frequency.exponentialRampToValueAtTime(1200, t + 0.1);
+                gain.gain.setValueAtTime(0, t);
+                gain.gain.linearRampToValueAtTime(0.3, t + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+                osc.start(t);
+                osc.stop(t + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, t);
+                osc.frequency.linearRampToValueAtTime(100, t + 0.2);
+                gain.gain.setValueAtTime(0, t);
+                gain.gain.linearRampToValueAtTime(0.2, t + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+                osc.start(t);
+                osc.stop(t + 0.3);
+            } else if (type === 'win') {
+                osc.type = 'square';
+                // Mainkan arpeggio kemenangan
+                [60, 64, 67, 72].forEach((note, i) => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.type = 'triangle';
+                    o.frequency.value = mToF(note);
+                    o.connect(g);
+                    g.connect(masterGain);
+                    g.gain.setValueAtTime(0, t + (i*0.15));
+                    g.gain.linearRampToValueAtTime(0.2, t + (i*0.15) + 0.05);
+                    g.gain.exponentialRampToValueAtTime(0.01, t + (i*0.15) + 0.5);
+                    o.start(t + (i*0.15));
+                    o.stop(t + (i*0.15) + 0.5);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
