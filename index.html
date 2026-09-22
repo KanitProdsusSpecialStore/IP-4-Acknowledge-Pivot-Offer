@@ -2,714 +2,962 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The CAN Bridge: Office Survival</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Bridge: Mission Alternative</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
-
         :root {
-            --glass-bg: rgba(25, 30, 40, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --primary-color: #00d2ff;
-            --success-color: #27ae60;
-            --danger-color: #e74c3c;
-            --text-light: #f8f9fa;
+            --neon-blue: #3B82F6;
+            --neon-pink: #EC4899;
+            --neon-purple: #8B5CF6;
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            overflow-x: hidden;
+            /* Animated gradient background */
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            background-size: 200% 200%;
+            animation: gradientBG 15s ease infinite;
+        }
+        h1, h2, h3, .font-poppins {
             font-family: 'Poppins', sans-serif;
         }
-
-        body {
-            /* Background pegunungan untuk tema petualangan */
-            background: linear-gradient(rgba(10, 20, 30, 0.7), rgba(10, 20, 30, 0.7)), 
-                        url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover fixed;
-            color: var(--text-light);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-        }
-
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 20px;
-            flex: 1;
-        }
-
-        h1, h2, h3 { text-align: center; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
         
-        p { line-height: 1.6; margin-bottom: 15px; }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-        /* BUTTONS */
-        button {
-            background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
-            border: none;
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(236, 72, 153, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0); }
+        }
+
+        .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
+        .animate-shake { animation: shake 0.3s ease-in-out; }
+        
+        /* Gen Z Glassmorphism Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(236, 72, 153, 0.4);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+
+        .chat-bubble-incoming {
+            background: #334155;
+            border-radius: 1rem 1rem 1rem 0;
+            border-left: 4px solid var(--neon-blue);
+        }
+        .chat-bubble-outgoing {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 1rem 1rem 0 1rem;
+        }
+
+        #banned-word-alert {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(220, 38, 38, 0.9);
             color: white;
-            padding: 12px 25px;
-            font-size: 1.1em;
-            font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 15px rgba(0, 198, 255, 0.4);
-            display: inline-block;
-        }
-        button:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0, 198, 255, 0.6); }
-        button:active { transform: translateY(1px); }
-        button:disabled { background: #555; cursor: not-allowed; box-shadow: none; transform: none; }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            box-shadow: none;
-        }
-        .btn-outline:hover { background: rgba(0, 210, 255, 0.1); }
-
-        /* SCREENS */
-        .screen { display: none; animation: fadeIn 0.5s ease-in-out; }
-        .screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* FORM */
-        .form-group { margin-bottom: 20px; text-align: left; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; }
-        .form-group input {
-            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.1); color: white; font-size: 1em; outline: none;
-        }
-        .form-group input:focus { border-color: var(--primary-color); background: rgba(255,255,255,0.2); }
-
-        /* HUD & PROGRESS */
-        .hud {
-            display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; padding: 15px; border-radius: 15px;
-        }
-        .progress-container { flex-grow: 1; margin: 0 20px; height: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; overflow: hidden; position: relative; min-width: 200px;}
-        .progress-bar { height: 100%; background: linear-gradient(90deg, #f1c40f, #2ecc71); width: 0%; transition: width 0.5s ease; }
-        .stats { display: flex; gap: 20px; font-weight: bold; }
-        .badge-display { display: flex; gap: 5px; }
-        .badge-icon { width: 30px; height: 30px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8em; opacity: 0.3; transition: all 0.3s;}
-        .badge-icon.earned { opacity: 1; background: gold; color: #333; box-shadow: 0 0 10px gold;}
-
-        /* GAME GRID */
-        .grid {
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; perspective: 1000px;
-        }
-        .card {
-            aspect-ratio: 3/4; background: transparent; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
-        }
-        .card.flip { transform: rotateY(180deg); }
-        .card.matched { visibility: hidden; opacity: 0; transition: visibility 0s 0.5s, opacity 0.5s; }
-        
-        .card-face {
-            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
-            border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.3); font-size: 0.85em; border: 2px solid rgba(255,255,255,0.1);
-        }
-        .card-back {
-            background: linear-gradient(135deg, #2c3e50, #3498db);
-            background-size: 200% 200%; animation: gradientBG 5s ease infinite;
-        }
-        .card-back::after { content: "⛰️"; font-size: 2.5em; opacity: 0.8; }
-        .card-front { transform: rotateY(180deg); overflow-y: auto; }
-        
-        .type-problem { background: rgba(231, 76, 60, 0.9); }
-        .type-solution { background: rgba(39, 174, 96, 0.9); }
-
-        .hint-text { font-size: 0.7em; opacity: 0.7; margin-bottom: 5px; font-weight: bold; }
-
-        @keyframes gradientBG { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
-
-        /* DEBRIEFING */
-        .feedback-list { text-align: left; margin-top: 20px; max-height: 400px; overflow-y: auto; padding-right: 10px; }
-        .feedback-item { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid var(--primary-color); }
-        .feedback-item .prob { color: #ff7675; font-weight: bold; margin-bottom: 5px;}
-        .feedback-item .sol { color: #55efc4; }
-
-        footer { text-align: center; padding: 20px; font-size: 0.8em; opacity: 0.6; margin-top: auto; }
-
-        .controls { position: fixed; top: 20px; right: 20px; z-index: 100; }
-        .controls button { padding: 8px 15px; font-size: 0.9em; border-radius: 8px; }
-
-        /* RESPONSIVE */
-        @media (max-width: 900px) { .grid { grid-template-columns: repeat(4, 1fr); } }
-        @media (max-width: 600px) { 
-            .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } 
-            .card-face { font-size: 0.7em; padding: 8px; }
-            .hud { flex-direction: column; gap: 10px; }
-            .progress-container { width: 100%; margin: 10px 0; }
+            padding: 1rem 2rem;
+            border-radius: 999px;
+            font-weight: bold;
+            z-index: 1000;
+            font-family: 'Poppins';
+            text-transform: uppercase;
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.6);
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex items-center justify-center p-4">
 
-    <div class="controls">
-        <button id="btn-audio" class="btn-outline" onclick="toggleAudio()">🔇 BGM Off</button>
-    </div>
-
-    <div class="container">
+    <div id="app-container" class="w-full max-w-md h-[90vh] md:h-[850px] glass-card relative overflow-hidden flex flex-col shadow-2xl shadow-purple-900/20">
         
-        <!-- SCREEN 1: GATEWAY -->
-        <div id="screen-gateway" class="screen active glass-panel">
-            <h1>⛰️ The CAN Bridge</h1>
-            <h3 style="color: var(--primary-color); font-weight: 400;">Office Survival Expedition</h3>
-            
-            <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px; margin-bottom: 25px;">
-                <p style="font-style: italic; text-align: center;">"Mengapa kita sering terjebak dalam argumen panjang saat menolak permintaan rekan kerja? Bagaimana jika kita bisa tetap mematuhi aturan SOP, namun mengubah lawan bicara menjadi sekutu?"</p>
-            </div>
+        <!-- Banned Word UI Overlay -->
+        <div id="banned-word-alert">BUREAUCRATIC ALERT! Trust -20</div>
 
-            <div class="form-group">
-                <label for="playerName">Nama Explorer</label>
-                <input type="text" id="playerName" placeholder="Masukkan Nama Anda..." autocomplete="off">
+        <!-- 1. GATEWAY SCREEN -->
+        <div id="screen-gateway" class="absolute inset-0 flex flex-col p-6 overflow-y-auto animate-slide-up">
+            <div class="flex-1 flex flex-col justify-center items-center text-center space-y-6">
+                <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center shadow-lg shadow-purple-500/50 mb-4 animate-bounce" style="animation-duration: 3s;">
+                    <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">THE BRIDGE</h1>
+                    <h2 class="text-xl font-bold text-gray-300 tracking-widest mt-1">MISSION ALTERNATIVE</h2>
+                </div>
+                <p class="text-sm text-gray-400 mt-2">Birokrasi adalah tembok. Anda adalah jembatannya.</p>
+
+                <div class="w-full max-w-xs space-y-4 mt-8 text-left">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1 ml-1 uppercase tracking-wider">Nama Lengkap</label>
+                        <input type="text" id="input-name" class="w-full bg-gray-800/50 border border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition" placeholder="Cth: Alexandra" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1 ml-1 uppercase tracking-wider">NIK / ID Karyawan</label>
+                        <input type="text" id="input-nik" class="w-full bg-gray-800/50 border border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition" placeholder="Cth: 20260199" required>
+                    </div>
+                    <button id="btn-login" class="w-full btn-primary text-white font-bold rounded-xl px-4 py-4 mt-4 text-lg shadow-lg">
+                        INITIATE SYSTEM
+                    </button>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="playerNIK">NIK / ID Karyawan</label>
-                <input type="text" id="playerNIK" placeholder="Masukkan NIK Anda..." autocomplete="off">
-            </div>
-            
-            <div style="text-align: center; margin-top: 30px;">
-                <button onclick="goToBriefing()">Mulai Ekspedisi 🚀</button>
+            <div class="mt-8 text-center text-xs text-gray-500 font-semibold tracking-wider pb-2">
+                Education & Training Dept. Â© 2026
             </div>
         </div>
 
-        <!-- SCREEN 2: BRIEFING & MATERI -->
-        <div id="screen-briefing" class="screen glass-panel">
-            <h2>📜 Mission Briefing</h2>
-            <p>Selamat datang, <span id="display-name" style="color: var(--primary-color); font-weight:bold;"></span>. Hari ini, meja Anda penuh dengan permintaan mendadak, keluhan, dan jalan buntu operasional.</p>
+        <!-- 2. MISSION BRIEFING SCREEN -->
+        <div id="screen-briefing" class="absolute inset-0 flex flex-col p-6 hidden overflow-y-auto bg-gray-900 z-10">
+            <h2 class="text-2xl font-black text-pink-400 border-b border-gray-700 pb-4 mb-4">MISSION BRIEFING</h2>
             
-            <div style="text-align: left; margin: 20px 0;">
-                <h4 style="color: #f1c40f;">🗺️ Analogi Google Maps</h4>
-                <p>Saat satu jalan ditutup, Google Maps tidak mengatakan "Anda tidak bisa lewat sini, silakan matikan mesin". Sistem langsung mencari <strong>RUTE ALTERNATIF</strong>. Itulah mentalitas kita hari ini.</p>
-                
-                <h4 style="color: #55efc4; margin-top: 15px;">🌉 Metode A - P - O (Pivot to CAN)</h4>
-                <ul>
-                    <li><strong>[A] Acknowledge:</strong> Validasi perasaan/kebutuhan mereka agar merasa didengar.</li>
-                    <li><strong>[P] Pivot:</strong> Jelaskan batasan/fakta/SOP secara obyektif tanpa menyalahkan.</li>
-                    <li><strong>[O] Offer (The CAN):</strong> Tawarkan alternatif tindakan yang BISA dilakukan saat ini juga.</li>
-                </ul>
+            <div class="space-y-6 flex-1 text-sm text-gray-300 leading-relaxed">
+                <div class="bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl">
+                    <h3 class="font-bold text-blue-400 mb-2 font-poppins text-lg">THE HOOK (WHY)</h3>
+                    <p>Setiap kali Anda berkata <span class="text-red-400 font-bold">"Tidak Bisa"</span> atau <span class="text-red-400 font-bold">"Sesuai SOP"</span>, operasional perusahaan berhenti satu detik. Misi Anda adalah menyelamatkan operasional perusahaan hari ini dengan menggeser fokus dari <i>jalan buntu</i> ke <i>opsi penyelamatan (Plan B)</i>.</p>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-purple-400 mb-2 font-poppins text-lg">YOUR ROLE</h3>
+                    <p>Sebagai <b>Senior Clerk / SPV</b>, Anda adalah "Jembatan" antar divisi (Sales, Logistik, Finance). Mereka akan datang dengan kondisi krisis.</p>
+                </div>
+
+                <div class="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
+                    <h3 class="font-bold text-green-400 mb-2 font-poppins text-lg">THE 3-STEP REFLEX</h3>
+                    <ol class="list-decimal pl-5 space-y-2">
+                        <li><b>Acknowledge:</b> Tunjukkan empati, jangan salahkan aturan.</li>
+                        <li><b>Pivot:</b> Singkirkan kata terlarang (Kosong, Tidak Bisa, Ditolak). Geser fokus.</li>
+                        <li><b>Offer:</b> Berikan solusi operasional ("Yang bisa saya bantu adalah...").</li>
+                    </ol>
+                </div>
+
+                <div class="flex items-center space-x-3 bg-red-900/20 p-3 rounded-lg border border-red-500/30">
+                    <div class="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center font-bold text-white shrink-0">!</div>
+                    <p class="text-xs">Hati-hati! Memilih frasa birokratis akan memicu <b>Banned Words Detector</b> dan menguras <b>Trust Meter</b> Anda. Jika Trust habis, Game Over.</p>
+                </div>
             </div>
 
-            <div style="background: rgba(231, 76, 60, 0.2); padding: 15px; border-radius: 10px; border-left: 4px solid #e74c3c; margin-bottom: 20px; text-align: left;">
-                <strong>Objektif Game:</strong><br>
-                Cocokkan Kartu Merah (Jalan Buntu/Masalah) dengan Kartu Hijau (Solusi A-P-O). Hati-hati, setiap langkah salah akan mengurangi poin energi Anda!
-            </div>
-
-            <div style="text-align: center;">
-                <button onclick="startGame()">Siap! Terjun ke Lapangan 🧗‍♂️</button>
+            <div class="mt-6 pt-4 border-t border-gray-700">
+                <button id="btn-start-mission" class="w-full btn-primary text-white font-bold rounded-xl px-4 py-4 text-lg shadow-[0_0_15px_rgba(139,92,246,0.5)] animate-pulse">
+                    ACCEPT MISSION
+                </button>
             </div>
         </div>
 
-        <!-- SCREEN 3: CORE GAME -->
-        <div id="screen-game" class="screen">
-            <div class="hud glass-panel" style="margin-bottom: 20px; padding: 15px;">
-                <div class="stats">
-                    <div>Poin: <span id="score" style="color: #f1c40f;">0</span></div>
-                    <div>Langkah: <span id="moves">0</span></div>
+        <!-- 3. GAME SCREEN -->
+        <div id="screen-game" class="absolute inset-0 flex flex-col hidden bg-gray-900 z-20">
+            <!-- Header Status -->
+            <div class="bg-gray-800 p-4 shadow-md flex flex-col space-y-3 z-30">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center font-bold shadow-lg" id="avatar-initial">A</div>
+                        <div>
+                            <div class="font-bold text-sm" id="ui-player-name">Player</div>
+                            <div class="text-xs text-blue-400 font-semibold" id="ui-role">Bridge Ops</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="text-right">
+                            <div class="text-xs text-gray-400">SCORE</div>
+                            <div class="font-black text-pink-400 text-lg leading-none" id="ui-score">0</div>
+                        </div>
+                        <button id="btn-mute" class="p-2 bg-gray-700 rounded-full hover:bg-gray-600 transition">
+                            <svg class="w-4 h-4 text-gray-300" id="icon-unmute" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5 15.5v-7a1 1 0 011-1h3l4-4v17l-4-4H6a1 1 0 01-1-1z"></path></svg>
+                            <svg class="w-4 h-4 text-gray-300 hidden" id="icon-mute" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h2.586l-1.293-1.293a1 1 0 011.414-1.414l11 11a1 1 0 01-1.414 1.414L15.414 15H15m-4 4v-4m0-4V3m0 0l-4 4m4-4l4 4"></path></svg>
+                        </button>
+                    </div>
                 </div>
                 
-                <div class="progress-container">
-                    <div class="progress-bar" id="progress-bar"></div>
-                    <div style="position: absolute; top:0; left:0; width:100%; text-align:center; font-size:0.7em; line-height: 15px; font-weight:bold;">Progress <span id="progress-text">0%</span></div>
+                <!-- Progress & Trust Meter -->
+                <div class="flex space-x-4">
+                    <div class="flex-1">
+                        <div class="flex justify-between text-[10px] text-gray-400 font-bold mb-1">
+                            <span>PROGRESS</span>
+                            <span id="ui-progress-text">1/10</span>
+                        </div>
+                        <div class="h-1.5 w-full bg-gray-700 rounded-full overflow-hidden">
+                            <div id="ui-progress-bar" class="h-full bg-blue-500 transition-all duration-500" style="width: 10%"></div>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex justify-between text-[10px] text-gray-400 font-bold mb-1">
+                            <span>TRUST METER</span>
+                            <span id="ui-trust-text">100%</span>
+                        </div>
+                        <div class="h-1.5 w-full bg-gray-700 rounded-full overflow-hidden">
+                            <div id="ui-trust-bar" class="h-full bg-green-500 transition-all duration-300" style="width: 100%"></div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="badge-display">
-                    <div class="badge-icon" id="badge-1" title="Sherpa Junior (3 Pasang)">🥉</div>
-                    <div class="badge-icon" id="badge-2" title="Mountain Guide (6 Pasang)">🥈</div>
-                    <div class="badge-icon" id="badge-3" title="Summit Conqueror (10 Pasang)">🥇</div>
+                <!-- Badges Display Area -->
+                <div id="ui-badges" class="flex space-x-2 h-6">
+                    <!-- Badges injected here -->
                 </div>
             </div>
-            
-            <div style="text-align: center; margin-bottom: 15px;">
-                <button class="btn-outline" onclick="useHint()" id="btn-hint" style="font-size: 0.8em; padding: 5px 15px;">Gunakan Hint (-15 Poin)</button>
+
+            <!-- Chat Area -->
+            <div id="chat-area" class="flex-1 p-4 overflow-y-auto space-y-4 pb-48 flex flex-col">
+                <!-- Messages injected here -->
             </div>
 
-            <div class="grid" id="game-grid">
-                <!-- Cards injected here -->
+            <!-- Action Area (Options) -->
+            <div class="absolute bottom-0 left-0 w-full bg-gray-800/95 backdrop-blur-md p-4 border-t border-gray-700 z-30 rounded-t-2xl shadow-[0_-10px_20px_rgba(0,0,0,0.3)]">
+                <div class="flex justify-between items-center mb-2">
+                    <div class="text-xs font-bold text-gray-400 uppercase" id="current-stage-indicator">Select Step 1: Acknowledge</div>
+                    <div class="text-xs font-bold text-pink-400" id="timer-display">â± 15.0s</div>
+                </div>
+                <div id="options-container" class="space-y-2">
+                    <!-- Buttons injected here -->
+                </div>
             </div>
         </div>
 
-        <!-- SCREEN 4: POST-ACTION DEBRIEF -->
-        <div id="screen-result" class="screen glass-panel">
-            <h2>🏆 Ekspedisi Selesai!</h2>
-            
-            <div style="text-align: center; margin: 20px 0;">
-                <h1 style="font-size: 4em; margin: 0; color: #f1c40f;" id="final-score">0</h1>
-                <p>Total Poin Akhir Anda</p>
-                <div id="reinforcement-msg" style="font-weight: bold; font-size: 1.2em; margin-top: 10px;"></div>
+        <!-- 4. DEBRIEF SCREEN -->
+        <div id="screen-result" class="absolute inset-0 flex flex-col hidden bg-gray-900 z-40 overflow-y-auto p-6">
+            <div class="text-center mb-6">
+                <div id="result-icon" class="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl mb-4 bg-gray-800 border-4">
+                    ðŸ†
+                </div>
+                <h2 class="text-3xl font-black font-poppins uppercase tracking-wider" id="result-title">MISSION COMPLETE</h2>
+                <p class="text-gray-400 mt-2" id="result-subtitle">Anda berhasil menjadi Jembatan Alternatif.</p>
             </div>
 
-            <h3 style="margin-top: 30px;">📋 Debriefing Lapangan</h3>
-            <p style="font-size: 0.9em; text-align:center;">Berikut adalah rekap bagaimana Anda mengubah jalan buntu menjadi Jembatan Alternatif hari ini:</p>
-            
-            <div class="feedback-list" id="feedback-list">
-                <!-- Feedback injected here -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-gray-800 p-4 rounded-xl text-center border border-gray-700">
+                    <div class="text-xs text-gray-400 font-bold mb-1">FINAL SCORE</div>
+                    <div class="text-2xl font-black text-pink-400" id="result-score">0</div>
+                </div>
+                <div class="bg-gray-800 p-4 rounded-xl text-center border border-gray-700">
+                    <div class="text-xs text-gray-400 font-bold mb-1">REMAINING TRUST</div>
+                    <div class="text-2xl font-black text-green-400" id="result-trust">0%</div>
+                </div>
             </div>
 
-            <div style="text-align: center; margin-top: 30px;">
-                <button onclick="location.reload()">Selesaikan Modul & Main Lagi 🔄</button>
+            <h3 class="font-bold text-lg mb-4 text-blue-400 border-b border-gray-700 pb-2">POST-ACTION DEBRIEF</h3>
+            <div id="debrief-list" class="space-y-4 mb-8">
+                <!-- Evaluation injected here -->
             </div>
+
+            <button id="btn-restart" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl px-4 py-4 text-lg transition mb-4">
+                RE-DEPLOY MISSION
+            </button>
+            <div class="text-center text-xs text-gray-500 pb-4">Education & Training Dept. Â© 2026</div>
         </div>
 
     </div>
-
-    <footer>
-        Education & Training Dept. © 2026 | The CAN Bridge Gamification Module
-    </footer>
 
     <script>
-        /* =========================================
-           DATA MATERI (10 PASANG SKENARIO)
-           Berdasarkan Teori Customer Service Survival Kit (Acknowledge-Pivot-Offer)
-           ========================================= */
-        const cardData = [
-            { id: 1, type: 'problem', text: "SOP melarang peminjaman proyektor ke luar gedung." },
-            { id: 1, type: 'solution', text: "[A] Saya ngerti alat ini krusial untuk event.\n[P] Aturan asuransi tidak cover alat di luar gedung.\n[O] Tapi saya BISA pesankan dari vendor rekanan kita segera." },
-            
-            { id: 2, type: 'problem', text: "Permintaan laporan mendadak untuk meeting 10 menit lagi." },
-            { id: 2, type: 'solution', text: "[A] Laporan ini pasti ditunggu Direksi sekarang.\n[P] Butuh 2 jam tarikan sistem untuk data lengkap.\n[O] Yang BISA saya siapkan dalam 10 menit adalah Executive Summary-nya." },
-            
-            { id: 3, type: 'problem', text: "Budget training departemenmu sudah habis bulan ini." },
-            { id: 3, type: 'solution', text: "[A] Training ini sangat penting untuk skill tim.\n[P] Kuota budget bulan ini statusnya sudah limit.\n[O] Saya BISA amankan kuota untuk tim Anda di batch pertama awal bulan depan." },
-            
-            { id: 4, type: 'problem', text: "Sistem HRIS down, tidak bisa input cuti mendesak." },
-            { id: 4, type: 'solution', text: "[A] Cuti ini pasti sudah Anda rencanakan jauh hari.\n[P] Sistem server sedang maintenance tak terduga.\n[O] Silakan isi form manual ini, saya BISA inputkan prioritas setelah sistem UP." },
-            
-            { id: 5, type: 'problem', text: "Ruang meeting utama sudah di-booking seharian." },
-            { id: 5, type: 'solution', text: "[A] Meeting Anda melibatkan klien VIP yang penting.\n[P] Sayangnya ruang utama full booked dari pagi.\n[O] Saya BISA siapkan ruang Executive di lantai 2 yang fasilitasnya setara." },
-            
-            { id: 6, type: 'problem', text: "Saya tidak punya wewenang approve diskon 20%." },
-            { id: 6, type: 'solution', text: "[A] Diskon ini kunci untuk deal dengan klien besar.\n[P] Limit approval sistem saya maksimal hanya 10%.\n[O] Saya BISA bantu eskalasikan ini ke Direktur sekarang agar diproses cepat." },
-            
-            { id: 7, type: 'problem', text: "Barang suvenir tipe A untuk tamu habis di gudang." },
-            { id: 7, type: 'solution', text: "[A] Tamu VIP harus mendapat impresi terbaik.\n[P] Namun stok suvenir tipe A sedang kosong di sistem.\n[O] Kita BISA berikan suvenir tipe B edisi premium, saya ambilkan sekarang." },
-            
-            { id: 8, type: 'problem', text: "Tidak bisa reimburse cash advance tanpa struk asli." },
-            { id: 8, type: 'solution', text: "[A] Saya tahu Anda sudah pakai uang pribadi untuk ini.\n[P] SOP audit Finance mewajibkan bukti fisik/asli.\n[O] Jika struk hilang, Anda BISA lampirkan mutasi bank + form kehilangan internal." },
-            
-            { id: 9, type: 'problem', text: "Tim IT kami overload, tidak bisa cek PC Anda hari ini." },
-            { id: 9, type: 'solution', text: "[A] Tanpa PC, kerjaan harian Anda pasti terhambat.\n[P] Semua teknisi sedang menangani server down.\n[O] Saya BISA pinjamkan laptop spare di loker agar Anda bisa kerja sementara." },
-            
-            { id: 10, type: 'problem', text: "Desainer full, tidak bisa kerjakan revisi hari ini." },
-            { id: 10, type: 'solution', text: "[A] Revisi brosur ini butuh cepat untuk naik cetak besok.\n[P] Tim internal sedang full capacity hari ini.\n[O] Saya BISA alokasikan ke freelancer darurat kami untuk dikerjakan malam ini." }
-        ];
-
-        /* =========================================
-           STATE MANAJEMEN GAME
-           ========================================= */
-        let playerName = "";
-        let playerNIK = "";
-        let cards = [];
-        let firstCard = null, secondCard = null;
-        let lockBoard = false;
-        let matches = 0;
-        let moves = 0;
-        let score = 0;
-        const totalPairs = 10;
-
-        // Audio State
-        let audioCtx;
-        let isAudioPlaying = false;
-        let masterGain;
-        let nextNoteTime = 0;
-        let current16thNote = 0;
-        let chordIndex = 0;
-        let schedulerTimer;
-
-        // Chords Progression (Am, F, C, G) - MIDI note numbers
-        const chords = [
-            [57, 60, 64], // Am (A, C, E)
-            [53, 57, 60], // F (F, A, C)
-            [48, 52, 55], // C (C, E, G)
-            [55, 59, 62]  // G (G, B, D)
-        ];
-
-        /* =========================================
-           FUNGSI UI & ALUR
-           ========================================= */
-        function switchScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-        }
-
-        function goToBriefing() {
-            playerName = document.getElementById('playerName').value.trim();
-            playerNIK = document.getElementById('playerNIK').value.trim();
-            
-            if(!playerName || !playerNIK) {
-                alert("Mohon masukkan Nama dan NIK Anda untuk memulai ekspedisi.");
-                return;
-            }
-            
-            document.getElementById('display-name').innerText = playerName;
-            
-            // Inisialisasi Audio saat interaksi pertama user (Kebijakan Browser)
-            if(!audioCtx) initAudio();
-            if(!isAudioPlaying) toggleAudio(); // Start BGM
-
-            switchScreen('screen-briefing');
-        }
-
-        function startGame() {
-            switchScreen('screen-game');
-            initBoard();
-        }
-
-        /* =========================================
-           CORE MECHANICS: MATCHING PAIRS
-           ========================================= */
-        function initBoard() {
-            const grid = document.getElementById('game-grid');
-            grid.innerHTML = '';
-            
-            // Acak kartu
-            cards = [...cardData];
-            cards.sort(() => 0.5 - Math.random());
-
-            cards.forEach(item => {
-                const cardEl = document.createElement('div');
-                cardEl.classList.add('card');
-                cardEl.dataset.id = item.id;
-                cardEl.dataset.type = item.type;
-
-                const typeClass = item.type === 'problem' ? 'type-problem' : 'type-solution';
-                const hintTitle = item.type === 'problem' ? '⚠️ JALAN BUNTU' : '✅ OPSI PENYELAMATAN (A-P-O)';
-
-                cardEl.innerHTML = `
-                    <div class="card-face card-front ${typeClass}">
-                        <div class="hint-text">${hintTitle}</div>
-                        <div>${item.text.replace(/\n/g, '<br><br>')}</div>
-                    </div>
-                    <div class="card-face card-back"></div>
-                `;
-
-                cardEl.addEventListener('click', flipCard);
-                grid.appendChild(cardEl);
-            });
-
-            updateHUD();
-        }
-
-        function flipCard() {
-            if (lockBoard) return;
-            if (this === firstCard) return;
-            if (this.classList.contains('matched')) return;
-
-            this.classList.add('flip');
-
-            if (!firstCard) {
-                firstCard = this;
-                return;
-            }
-
-            secondCard = this;
-            moves++;
-            checkForMatch();
-        }
-
-        function checkForMatch() {
-            lockBoard = true;
-            let isMatch = firstCard.dataset.id === secondCard.dataset.id && 
-                          firstCard.dataset.type !== secondCard.dataset.type;
-
-            if (isMatch) {
-                handleMatch();
-            } else {
-                handleMismatch();
-            }
-        }
-
-        function handleMatch() {
-            playSFX('correct');
-            score += 20; // Poin besar karena 10 pasang cukup sulit
-            matches++;
-            
-            setTimeout(() => {
-                firstCard.classList.add('matched');
-                secondCard.classList.add('matched');
-                resetBoard();
-                updateHUD();
-                checkWin();
-            }, 1000); // Tahan sebentar agar bisa dibaca
-        }
-
-        function handleMismatch() {
-            playSFX('wrong');
-            score = Math.max(0, score - 5); // Penalti
-            
-            setTimeout(() => {
-                firstCard.classList.remove('flip');
-                secondCard.classList.remove('flip');
-                resetBoard();
-                updateHUD();
-            }, 1500);
-        }
-
-        function resetBoard() {
-            [firstCard, secondCard, lockBoard] = [null, null, false];
-        }
-
-        function updateHUD() {
-            document.getElementById('score').innerText = score;
-            document.getElementById('moves').innerText = moves;
-            
-            const pct = (matches / totalPairs) * 100;
-            document.getElementById('progress-bar').style.width = pct + '%';
-            document.getElementById('progress-text').innerText = Math.round(pct) + '%';
-
-            // Badges
-            if (matches >= 3) document.getElementById('badge-1').classList.add('earned');
-            if (matches >= 6) document.getElementById('badge-2').classList.add('earned');
-            if (matches >= 10) document.getElementById('badge-3').classList.add('earned');
-        }
-
-        function useHint() {
-            if (score < 15) {
-                alert("Poin Anda tidak cukup untuk Hint. Butuh 15 Poin.");
-                return;
-            }
-            if (lockBoard) return;
-            
-            score -= 15;
-            updateHUD();
-            
-            // Intip sebentar (Buka kartu yang belum match selama 1.5 detik)
-            lockBoard = true;
-            const allCards = document.querySelectorAll('.card:not(.matched):not(.flip)');
-            allCards.forEach(c => c.classList.add('flip'));
-            
-            setTimeout(() => {
-                allCards.forEach(c => c.classList.remove('flip'));
-                lockBoard = false;
-            }, 1500);
-        }
-
-        function checkWin() {
-            if (matches === totalPairs) {
-                setTimeout(showDebrief, 1000);
-            }
-        }
-
-        function showDebrief() {
-            switchScreen('screen-result');
-            
-            // Hentikan BGM pelan-pelan
-            if(masterGain) {
-                masterGain.gain.setTargetAtTime(0, audioCtx.currentTime, 2);
-                setTimeout(() => { toggleAudio(); }, 2000);
-            }
-            playSFX('win');
-
-            document.getElementById('final-score').innerText = score;
-            
-            const msgEl = document.getElementById('reinforcement-msg');
-            if(score > 150) {
-                msgEl.innerText = "Luar Biasa! Anda adalah problem solver sejati dan negosiator ulung.";
-                msgEl.style.color = "#2ecc71";
-            } else if (score > 80) {
-                msgEl.innerText = "Bagus! Anda mulai terbiasa membangun jembatan, pertahankan fokus 'The CAN'.";
-                msgEl.style.color = "#f1c40f";
-            } else {
-                msgEl.innerText = "Terus Berlatih! Refleks birokrasi memang kuat, tapi Anda di jalan yang benar.";
-                msgEl.style.color = "#e74c3c";
-            }
-
-            generateFeedbackList();
-        }
-
-        function generateFeedbackList() {
-            const listEl = document.getElementById('feedback-list');
-            listEl.innerHTML = '';
-            
-            // Kelompokkan berdasarkan ID untuk di render di akhir
-            for(let i=1; i<=totalPairs; i++) {
-                let prob = cardData.find(c => c.id === i && c.type === 'problem').text;
-                let sol = cardData.find(c => c.id === i && c.type === 'solution').text;
-                
-                listEl.innerHTML += `
-                    <div class="feedback-item">
-                        <div class="prob">🛑 Jalan Buntu: <br><span style="font-weight:normal; color:#ddd;">"${prob}"</span></div>
-                        <div class="sol" style="margin-top:10px;">✅ Alternatif (A-P-O): <br><span style="font-weight:normal; color:#ddd;">"${sol.replace(/\n/g, '<br>')}"</span></div>
-                    </div>
-                `;
-            }
-        }
-
-        /* =========================================
-           WEB AUDIO API ENGINE (BGM & SFX)
-           ========================================= */
-        function mToF(midiNote) {
-            return 440 * Math.pow(2, (midiNote - 69) / 12);
-        }
-
-        function initAudio() {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
-            masterGain = audioCtx.createGain();
-            masterGain.gain.value = 0.3; // Volume Master
-            masterGain.connect(audioCtx.destination);
-        }
-
-        function scheduleAudio() {
-            while (nextNoteTime < audioCtx.currentTime + 0.1) {
-                playStep(current16thNote, nextNoteTime);
-                nextNoteTime += 0.2; // Tempo (sekitar 75 BPM)
-                current16thNote++;
-                if (current16thNote === 16) {
-                    current16thNote = 0;
-                    chordIndex = (chordIndex + 1) % chords.length;
+        /**
+         * Game Content Data (10 Scenarios)
+         * Each scenario has a sender, message, and 3 stages of responses (A-P-O).
+         * Each stage has a 'correct' (solutive) and 'wrong' (bureaucratic/banned word) option.
+         */
+        const gameData = [
+            // EASY LEVEL (1-5)
+            {
+                level: 1, sender: "Sales Dept", avatar: "S", role: "Account Exec",
+                message: "Urgent! Klien VIP minta pengiriman barang besok pagi, ini krusial buat target kuartal ini!",
+                stages: {
+                    acknowledge: [
+                        { text: "Saya mengerti urgensinya, namun permintaan H-1 biasanya memang sulit diproses.", isCorrect: false, type: "bureaucratic" },
+                        { text: "Saya paham ini sangat krusial untuk pencapaian target klien VIP kuartal ini.", isCorrect: true, type: "empathy" }
+                    ],
+                    pivot: [
+                        { text: "Saat ini kendalanya adalah stok di gudang utama belum masuk lagi.", isCorrect: false, type: "banned_word" },
+                        { text: "Mari kita segera petakan ketersediaan stok dari sumber alternatif.", isCorrect: true, type: "solution" }
+                    ],
+                    offer: [
+                        { text: "Kita akan coba ajukan ke pusat, meski tidak jamin besok pagi bisa terkirim.", isCorrect: false, type: "banned_word" },
+                        { text: "Yang bisa saya bantu amankan adalah pengiriman parsial dari cabang terdekat besok pagi, sisanya menyusul lusa.", isCorrect: true, type: "action" }
+                    ]
+                }
+            },
+            {
+                level: 2, sender: "Finance Dept", avatar: "F", role: "Reimbursement",
+                message: "Tolong approve klaim dana tim lapangan hari ini juga, mereka butuh uang bensin!",
+                stages: {
+                    acknowledge: [
+                        { text: "Tentu, operasional tim lapangan memang butuh dukungan dana yang lancar.", isCorrect: true, type: "empathy" },
+                        { text: "Saya apresiasi kerja keras tim, walaupun idealnya klaim diajukan lebih awal.", isCorrect: false, type: "bureaucratic" }
+                    ],
+                    pivot: [
+                        { text: "Fokus kita sekarang adalah menyeleksi data yang sudah siap dieksekusi.", isCorrect: true, type: "solution" },
+                        { text: "Hanya saja, sistem kita sedang dalam masa cut-off jadi belum bisa proses semua.", isCorrect: false, type: "banned_word" }
+                    ],
+                    offer: [
+                        { text: "Mohon ditunggu saja, saya akan coba dorong approval-nya secepat mungkin jika sistem sudah normal.", isCorrect: false, type: "banned_word" },
+                        { text: "Yang bisa saya proses cairkan hari ini adalah klaim di bawah 500rb, sisanya saya jadwalkan prioritas besok.", isCorrect: true, type: "action" }
+                    ]
+                }
+            },
+            {
+                level: 3, sender: "Marketing", avatar: "M", role: "Event SPV",
+                message: "Kami butuh cetak 500 brosur tambahan siang ini untuk pameran mendadak!",
+                stages: {
+                    acknowledge: [
+                        { text: "Pameran mendadak pasti butuh dukungan materi promosi yang responsif.", isCorrect: true, type: "empathy" },
+                        { text: "Wah, 500 brosur siang ini cukup berat mengingat antrean cetak kita.", isCorrect: false, type: "bureaucratic" }
+                    ],
+                    pivot: [
+                        { text: "Kapasitas mesin in-house kita saat ini tidak mencukupi untuk jumlah sebanyak itu sekaligus.", isCorrect: false, type: "banned_word" },
+                        { text: "Mari kita maksimalkan kapasitas in-house yang tersedia saat ini.", isCorrect: true, type: "solution" }
+                    ],
+                    offer: [
+                        { text: "Yang bisa saya amankan adalah 100 lembar pertama untuk siang ini, sisanya langsung dikirim bertahap ke lokasi.", isCorrect: true, type: "action" },
+                        { text: "Bisa saja dicetak, tapi kualitasnya mungkin menurun karena buru-buru, mohon dimaklumi.", isCorrect: false, type: "banned_word" }
+                    ]
+                }
+            },
+            {
+                level: 4, sender: "IT Support", avatar: "I", role: "Helpdesk",
+                message: "Kami mau melakukan maintenance server jam 2 siang ini. Tolong beritahu semua tim ops untuk logout.",
+                stages: {
+                    acknowledge: [
+                        { text: "Jam 2 siang biasanya traffic sedang tinggi-tingginya untuk operasional.", isCorrect: false, type: "bureaucratic" },
+                        { text: "Maintenance server sangat penting untuk menjaga stabilitas sistem ke depan.", isCorrect: true, type: "empathy" }
+                    ],
+                    pivot: [
+                        { text: "Agar tidak bentrok, kita perlu menyelaraskan eksekusinya dengan jam turun operasional.", isCorrect: true, type: "solution" },
+                        { text: "Tetapi jam operasional tidak mengizinkan adanya downtime mendadak siang ini.", isCorrect: false, type: "banned_word" }
+                    ],
+                    offer: [
+                        { text: "Tolong ajukan ulang jadwalnya sesuai dengan prosedur downtime H-1 agar bisa kami sesuaikan.", isCorrect: false, type: "banned_word" },
+                        { text: "Yang bisa saya aturkan adalah menjadwalkan ulang maintenance ke jam 5 sore saat aktivitas sudah landai.", isCorrect: true, type: "action" }
+                    ]
+                }
+            },
+            {
+                level: 5, sender: "Logistics", avatar: "L", role: "Fleet Mgr",
+                message: "Dua armada truk kita mogok. Pengiriman ke area Barat terancam delay total hari ini.",
+                stages: {
+                    acknowledge: [
+                        { text: "Kendala armada pasti membuat tekanan besar pada jadwal pengiriman hari ini.", isCorrect: true, type: "empathy" },
+                        { text: "Sayang sekali dua truk bisa mogok bersamaan, ini cukup merepotkan penjadwalan.", isCorrect: false, type: "bureaucratic" }
+                    ],
+                    pivot: [
+                        { text: "Oleh karena itu, kita harus segera mengamankan opsi rute dan kendaraan cadangan.", isCorrect: true, type: "solution" },
+                        { text: "Dengan hilangnya dua armada, kapasitas kirim kita otomatis berkurang drastis hari ini.", isCorrect: false, type: "banned_word" }
+                    ],
+                    offer: [
+                        { text: "Yang bisa saya siapkan adalah memindahkan prioritas kiriman VIP ke mobil box kecil, sisanya ke vendor pihak ketiga.", isCorrect: true, type: "action" },
+                        { text: "Tolong kabari pelanggan terkait status force majeure ini agar mereka memaklumi keterlambatan.", isCorrect: false, type: "banned_word" }
+                    ]
+                }
+            },
+            // HARD LEVEL (6-10) - More ambiguous
+            {
+                level: 6, sender: "HR Dept", avatar: "H", role: "Training",
+                message: "Ruang meeting utama bocor! Padahal 30 menit lagi ada induksi karyawan baru.",
+                stages: {
+                    acknowledge: [
+                        { text: "Ini seharusnya ranah tim GA untuk mengecek kelayakan fasilitas sebelum acara.", isCorrect: false, type: "bureaucratic" },
+                        { text: "Kondisi darurat 30 menit sebelum acara penting tentu butuh penanganan instan.", isCorrect: true, type: "empathy" }
+                    ],
+                    pivot: [
+                        { text: "Sayangnya menurut sistem booking, ruang meeting lain sedang dipakai penuh saat ini.", isCorrect: false, type: "banned_word" },
+                        { text: "Fokus kita sekarang adalah memindahkan lokasi acara secepat mungkin.", isCorrect: true, type: "solution" }
+                    ],
+                    offer: [
+                        { text: "Yang bisa kita gunakan segera adalah area lounge eksekutif, saya minta tim bantu set-up kursi sekarang.", isCorrect: true, type: "action" },
+                        { text: "Coba ditanyakan ke divisi lain, barangkali ada yang mau bertukar jadwal ruangan sementara waktu.", isCorrect: false, type: "banned_word" }
+                    ]
+                }
+            },
+            {
+                level: 7, sender: "Director", avatar: "D", role: "BOD",
+                message: "Saya butuh laporan komprehensif performa kuartal 3 di meja saya dalam 1 jam.",
+                stages: {
+                    acknowledge: [
+                        { text: "Tentu Bapak, data Q3 ini sangat krusial untuk agenda meeting pimpinan.", isCorrect: true, type: "empathy" },
+                        { text: "Baik Bapak, walaupun biasanya kompilasi komprehensif ini membutuhkan waktu setengah hari kerja.", isCorrect: false, type: "bureaucratic" }
+                    ],
+                    pivot: [
+                        { text: "Mari kita petakan poin data paling strategis yang dibutuhkan segera.", isCorrect: true, type: "solution" },
+                        { text: "Hanya saja, data dari tiga cabang utama masih belum tersinkronisasi ke sistem kami.", isCorrect: false, type: "banned_word" }
+                    ],
+                    offer: [
+                        { text: "Kami akan jalankan sesuai urutan request Pak, estimasi normal sekitar 2-3 jam kerja.", isCorrect: false, type: "banned_word" },
+                        { text: "Yang bisa saya sajikan dalam 1 jam adalah Executive Summary, sementara detail lengkapnya menyusul sore ini.", isCorrect: true, type: "action" }
+                    ]
+                }
+            },
+            {
+                level: 8, sender: "Legal", avatar: "C", role: "Compliance",
+                message: "Promo diskon akhir tahun belum ada izin tertulis dari Legal. Hentikan tayang iklannya sekarang!",
+                stages: {
+                    acknowledge: [
+                        { text: "Berhubung campaign sudah berjalan, menghentikannya secara mendadak cukup riskan.", isCorrect: false, type: "bureaucratic" },
+                        { text: "Saya sangat sepakat bahwa kepatuhan hukum adalah pelindung utama perusahaan.", isCorrect: true, type: "empathy" }
+                    ],
+                    pivot: [
+                        { text: "Kita akan menyelaraskan kembali materi kampanye ini agar sesuai dengan standar legal.", isCorrect: true, type: "solution" },
+                        { text: "Kalau dihentikan total sekarang, kita berisiko kehilangan momentum sales hari ini.", isCorrect: false, type: "banned_word" }
+                    ],
+                    offer: [
+                        { text: "Tolong berikan kelonggaran tayang untuk hari ini saja sambil kita urus dokumennya besok.", isCorrect: false, type: "banned_word" },
+                        { text: "Yang bisa saya eksekusi sekarang adalah menurunkan banner spesifik yang bermasalah, sembari kita revisi bersama.", isCorrect: true, type: "action" }
+                    ]
+                }
+            },
+            {
+                level: 9, sender: "Customer", avatar: "V", role: "VIP Client",
+                message: "Produk yang saya terima cacat produksi! Saya minta ganti rugi 10x lipat atau saya viralkan!",
+                stages: {
+                    acknowledge: [
+                        { text: "Kami mengerti keluhan Ibu, namun ancaman viral tidak akan menyelesaikan masalah dengan cepat.", isCorrect: false, type: "bureaucratic" },
+                        { text: "Kami sangat memahami kekecewaan Ibu saat menerima produk yang tidak sempurna.", isCorrect: true, type: "empathy" }
+                    ],
+                    pivot: [
+                        { text: "Namun untuk tuntutan ganti rugi 10x lipat, itu jelas di luar prosedur garansi kami.", isCorrect: false, type: "banned_word" },
+                        { text: "Sebagai bentuk tanggung jawab, kami memiliki skema resolusi yang memprioritaskan pelanggan VIP.", isCorrect: true, type: "solution" }
+                    ],
+                    offer: [
+                        { text: "Yang bisa kami wujudkan segera adalah pengiriman produk pengganti hari ini juga beserta voucher eksklusif permohonan maaf.", isCorrect: true, type: "action" },
+                        { text: "Kami akan memproses pengembalian dana 100%, mohon bantuannya mengisi form komplain resmi terlebih dahulu.", isCorrect: false, type: "banned_word" }
+                    ]
+                }
+            },
+            {
+                level: 10, sender: "All Dept", avatar: "!", role: "System Alert",
+                message: "Listrik padam di seluruh gedung. Genset utama gagal menyala. Aktivitas terhenti total.",
+                stages: {
+                    acknowledge: [
+                        { text: "Gangguan kelistrikan menyeluruh ini memang melumpuhkan ritme kerja kita.", isCorrect: true, type: "empathy" },
+                        { text: "Insiden teknis seperti ini memang di luar kendali dan prediksi kita semua.", isCorrect: false, type: "bureaucratic" }
+                    ],
+                    pivot: [
+                        { text: "Prioritas darurat kita adalah mempertahankan kelancaran untuk tugas-tugas operasional kritis.", isCorrect: true, type: "solution" },
+                        { text: "Tanpa daya cadangan, kita hampir tidak bisa melakukan kegiatan operasional normal.", isCorrect: false, type: "banned_word" }
+                    ],
+                    offer: [
+                        { text: "Sebaiknya kita himbau semua staf untuk stand-by di meja masing-masing sampai listrik kembali menyala.", isCorrect: false, type: "banned_word" },
+                        { text: "Yang bisa diatur: Tim inti bergeser ke co-working space dengan petty cash, sisanya dialihkan WFH parsial.", isCorrect: true, type: "action" }
+                    ]
                 }
             }
-            schedulerTimer = setTimeout(scheduleAudio, 25);
-        }
+        ];
 
-        function playStep(step, time) {
-            if(!isAudioPlaying) return;
-            const currentChord = chords[chordIndex];
+        let state = {
+            playerName: "",
+            playerNIK: "",
+            currentQuestionIndex: 0,
+            currentStageIndex: 0, // 0: Acknowledge, 1: Pivot, 2: Offer
+            score: 0,
+            trust: 100,
+            timer: 15.0,
+            timerInterval: null,
+            answersRecord: [], // Store results for debrief
+            badges: [],
+            isMuted: false,
+            audioContext: null,
+            bgmOscillator: null,
+            bgmGainNode: null,
+            nextNoteTime: 0,
+            currentNote: 0
+        };
 
-            // Instrumen 1: Pad (Setiap ketukan pertama dalam bar)
-            if (step === 0) {
-                currentChord.forEach(note => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.value = mToF(note);
-                    
-                    gain.gain.setValueAtTime(0, time);
-                    gain.gain.linearRampToValueAtTime(0.2, time + 1);
-                    gain.gain.linearRampToValueAtTime(0, time + 3.2);
-                    
-                    osc.connect(gain);
-                    gain.connect(masterGain);
-                    osc.start(time);
-                    osc.stop(time + 3.2);
-                });
-            }
+        const stageNames = ["Acknowledge", "Pivot", "Offer"];
+        
+        // DOM Elements
+        const screens = {
+            gateway: document.getElementById('screen-gateway'),
+            briefing: document.getElementById('screen-briefing'),
+            game: document.getElementById('screen-game'),
+            result: document.getElementById('screen-result')
+        };
 
-            // Instrumen 2: Bass (Ketukan 0 dan 8)
-            if (step === 0 || step === 8) {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                const filter = audioCtx.createBiquadFilter();
-                
-                osc.type = 'triangle';
-                osc.frequency.value = mToF(currentChord[0] - 12); // Turun 1 oktaf
-                
-                filter.type = 'lowpass';
-                filter.frequency.value = 300;
-                
-                gain.gain.setValueAtTime(0, time);
-                gain.gain.linearRampToValueAtTime(0.4, time + 0.1);
-                gain.gain.exponentialRampToValueAtTime(0.01, time + 1.5);
-                
-                osc.connect(filter);
-                filter.connect(gain);
-                gain.connect(masterGain);
-                osc.start(time);
-                osc.stop(time + 1.5);
-            }
-
-            // Instrumen 3: Arp (Pola sinkopasi)
-            if (step % 4 === 0 || step === 7 || step === 14) {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                
-                // Pilih nada dari chord (acak sedikit)
-                const note = currentChord[step % 3] + 12; // Naik 1 oktaf
-                osc.type = 'square';
-                osc.frequency.value = mToF(note);
-                
-                gain.gain.setValueAtTime(0, time);
-                gain.gain.linearRampToValueAtTime(0.05, time + 0.05);
-                gain.gain.exponentialRampToValueAtTime(0.001, time + 0.3);
-                
-                osc.connect(gain);
-                gain.connect(masterGain);
-                osc.start(time);
-                osc.stop(time + 0.3);
+        function initAudio() {
+            if(state.audioContext) return;
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                state.audioContext = new AudioContext();
+            } catch (e) {
+                console.warn("Web Audio API not supported");
             }
         }
 
-        function toggleAudio() {
-            if(!audioCtx) return;
-            const btn = document.getElementById('btn-audio');
-            if (isAudioPlaying) {
-                isAudioPlaying = false;
-                clearTimeout(schedulerTimer);
-                btn.innerText = "🔇 BGM Off";
-                btn.style.color = "var(--danger-color)";
-                btn.style.borderColor = "var(--danger-color)";
-            } else {
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                isAudioPlaying = true;
-                nextNoteTime = audioCtx.currentTime + 0.1;
-                scheduleAudio();
-                btn.innerText = "🔊 BGM On";
-                btn.style.color = "var(--success-color)";
-                btn.style.borderColor = "var(--success-color)";
+        // BGM Sequencer (Gen Z Arp Vibe)
+        const notes = [220.00, 261.63, 329.63, 392.00]; // A3, C4, E4, G4 (Am7 arpeggio)
+        let isBgmPlaying = false;
+        let bgmTimeoutId = null;
+
+        function playBGMStep() {
+            if (!state.audioContext || state.isMuted || !isBgmPlaying) return;
+
+            while (state.nextNoteTime < state.audioContext.currentTime + 0.1) {
+                playSynthNote(notes[state.currentNote], state.nextNoteTime, 0.15);
+                state.nextNoteTime += 0.25; // 16th note speed at 120bpm approx
+                state.currentNote = (state.currentNote + 1) % notes.length;
             }
+            bgmTimeoutId = setTimeout(playBGMStep, 25);
         }
 
-        function playSFX(type) {
-            if (!audioCtx) return;
-            const t = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+        function playSynthNote(freq, time, dur) {
+            if(!state.audioContext) return;
+            const osc = state.audioContext.createOscillator();
+            const gain = state.audioContext.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            
+            // Envelope
+            gain.gain.setValueAtTime(0, time);
+            gain.gain.linearRampToValueAtTime(0.05, time + 0.02); // gentle volume
+            gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+            
             osc.connect(gain);
-            gain.connect(masterGain);
+            gain.connect(state.audioContext.destination);
+            
+            osc.start(time);
+            osc.stop(time + dur);
+        }
 
-            if (type === 'correct') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, t);
-                osc.frequency.exponentialRampToValueAtTime(1200, t + 0.1);
-                gain.gain.setValueAtTime(0, t);
-                gain.gain.linearRampToValueAtTime(0.3, t + 0.05);
-                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
-                osc.start(t);
-                osc.stop(t + 0.3);
-            } else if (type === 'wrong') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, t);
-                osc.frequency.linearRampToValueAtTime(100, t + 0.2);
-                gain.gain.setValueAtTime(0, t);
-                gain.gain.linearRampToValueAtTime(0.2, t + 0.05);
-                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
-                osc.start(t);
-                osc.stop(t + 0.3);
-            } else if (type === 'win') {
-                osc.type = 'square';
-                // Mainkan arpeggio kemenangan
-                [60, 64, 67, 72].forEach((note, i) => {
-                    const o = audioCtx.createOscillator();
-                    const g = audioCtx.createGain();
-                    o.type = 'triangle';
-                    o.frequency.value = mToF(note);
-                    o.connect(g);
-                    g.connect(masterGain);
-                    g.gain.setValueAtTime(0, t + (i*0.15));
-                    g.gain.linearRampToValueAtTime(0.2, t + (i*0.15) + 0.05);
-                    g.gain.exponentialRampToValueAtTime(0.01, t + (i*0.15) + 0.5);
-                    o.start(t + (i*0.15));
-                    o.stop(t + (i*0.15) + 0.5);
-                });
+        function toggleBGM(play) {
+            if(!state.audioContext) return;
+            isBgmPlaying = play;
+            if (play) {
+                if (state.audioContext.state === 'suspended') state.audioContext.resume();
+                state.nextNoteTime = state.audioContext.currentTime + 0.1;
+                playBGMStep();
+            } else {
+                clearTimeout(bgmTimeoutId);
             }
         }
+
+        // SFX Generation
+        function playSFX(type) {
+            if(!state.audioContext || state.isMuted) return;
+            const ctx = state.audioContext;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            
+            const now = ctx.currentTime;
+            
+            switch(type) {
+                case 'correct':
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                    break;
+                case 'wrong':
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(50, now + 0.3);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                    break;
+                case 'click':
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, now);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                    break;
+                case 'banned':
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(100, now);
+                    osc.frequency.linearRampToValueAtTime(80, now + 0.4);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                    break;
+            }
+        }
+
+        function switchScreen(screenId) {
+            Object.values(screens).forEach(s => s.classList.add('hidden'));
+            screens[screenId].classList.remove('hidden');
+            screens[screenId].classList.add('animate-slide-up');
+        }
+
+        document.getElementById('btn-login').addEventListener('click', () => {
+            const name = document.getElementById('input-name').value.trim();
+            const nik = document.getElementById('input-nik').value.trim();
+            
+            if(name && nik) {
+                state.playerName = name;
+                state.playerNIK = nik;
+                document.getElementById('ui-player-name').innerText = name;
+                document.getElementById('avatar-initial').innerText = name.charAt(0).toUpperCase();
+                initAudio();
+                playSFX('click');
+                switchScreen('briefing');
+            } else {
+                document.getElementById('input-name').classList.add('animate-shake', 'border-red-500');
+                setTimeout(() => document.getElementById('input-name').classList.remove('animate-shake'), 300);
+            }
+        });
+
+        document.getElementById('btn-start-mission').addEventListener('click', () => {
+            playSFX('click');
+            toggleBGM(true);
+            switchScreen('game');
+            startGame();
+        });
+
+        document.getElementById('btn-mute').addEventListener('click', () => {
+            state.isMuted = !state.isMuted;
+            document.getElementById('icon-unmute').classList.toggle('hidden', state.isMuted);
+            document.getElementById('icon-mute').classList.toggle('hidden', !state.isMuted);
+            if(state.isMuted) toggleBGM(false);
+            else toggleBGM(true);
+        });
+
+        function startGame() {
+            state.currentQuestionIndex = 0;
+            state.score = 0;
+            state.trust = 100;
+            state.answersRecord = [];
+            state.badges = [];
+            updateUI();
+            renderQuestion();
+        }
+
+        function updateUI() {
+            document.getElementById('ui-score').innerText = state.score;
+            document.getElementById('ui-trust-bar').style.width = `${state.trust}%`;
+            document.getElementById('ui-trust-text').innerText = `${state.trust}%`;
+            
+            let progressPercent = ((state.currentQuestionIndex) / gameData.length) * 100;
+            document.getElementById('ui-progress-bar').style.width = `${progressPercent}%`;
+            document.getElementById('ui-progress-text').innerText = `${state.currentQuestionIndex + 1}/${gameData.length}`;
+
+            // Trust Color Coding
+            const trustBar = document.getElementById('ui-trust-bar');
+            trustBar.className = 'h-full transition-all duration-300';
+            if(state.trust > 60) trustBar.classList.add('bg-green-500');
+            else if(state.trust > 30) trustBar.classList.add('bg-yellow-500');
+            else trustBar.classList.add('bg-red-500');
+            
+            renderBadges();
+        }
+
+        function renderBadges() {
+            const badgeContainer = document.getElementById('ui-badges');
+            badgeContainer.innerHTML = state.badges.map(b => `<div class="text-xs px-2 py-0.5 rounded-md bg-pink-500/20 text-pink-300 border border-pink-500/50 shadow-[0_0_5px_rgba(236,72,153,0.5)]">${b}</div>`).join('');
+        }
+
+        function checkBadges() {
+            if (state.currentQuestionIndex === 4 && !state.badges.includes("Novice Bridge")) {
+                state.badges.push("Novice Bridge");
+                showFloatingText("+ Badge: Novice Bridge", 'text-pink-400');
+            }
+            if (state.currentQuestionIndex === 9 && !state.badges.includes("Master Bridge")) {
+                state.badges.push("Master Bridge");
+                showFloatingText("+ Badge: Master Bridge", 'text-pink-400');
+            }
+        }
+
+        function renderQuestion() {
+            if (state.trust <= 0) {
+                endGame(false);
+                return;
+            }
+            if (state.currentQuestionIndex >= gameData.length) {
+                endGame(true);
+                return;
+            }
+
+            state.currentStageIndex = 0;
+            const q = gameData[state.currentQuestionIndex];
+            
+            const chatArea = document.getElementById('chat-area');
+            chatArea.innerHTML = ''; // Clear chat
+
+            // Add incoming message
+            appendMessage(q.sender, q.role, q.avatar, q.message, 'incoming');
+            
+            renderOptions();
+            checkBadges();
+            updateUI();
+        }
+
+        function appendMessage(name, role, avatar, text, type) {
+            const chatArea = document.getElementById('chat-area');
+            const align = type === 'incoming' ? 'self-start' : 'self-end';
+            const bubbleClass = type === 'incoming' ? 'chat-bubble-incoming text-gray-200' : 'chat-bubble-outgoing text-white';
+            const avatarColor = type === 'incoming' ? 'bg-blue-600' : 'bg-purple-600';
+            const avatarInitial = type === 'incoming' ? avatar : state.playerName.charAt(0).toUpperCase();
+            
+            let headerHtml = '';
+            if (type === 'incoming') {
+                headerHtml = `<div class="flex items-center space-x-2 mb-1">
+                                <div class="w-6 h-6 rounded-full ${avatarColor} flex items-center justify-center text-[10px] font-bold">${avatarInitial}</div>
+                                <span class="text-xs font-bold text-gray-400">${name} <span class="font-normal">(${role})</span></span>
+                              </div>`;
+            }
+
+            const html = `
+                <div class="${align} max-w-[85%] animate-slide-up">
+                    ${headerHtml}
+                    <div class="${bubbleClass} p-3 text-sm shadow-md">
+                        ${text}
+                    </div>
+                </div>
+            `;
+            chatArea.insertAdjacentHTML('beforeend', html);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function startTimer() {
+            clearInterval(state.timerInterval);
+            state.timer = 15.0;
+            document.getElementById('timer-display').innerText = `â± ${state.timer.toFixed(1)}s`;
+            document.getElementById('timer-display').className = 'text-xs font-bold text-pink-400';
+
+            state.timerInterval = setInterval(() => {
+                state.timer -= 0.1;
+                if (state.timer <= 0) {
+                    state.timer = 0;
+                    clearInterval(state.timerInterval);
+                    handleTimeOut();
+                }
+                
+                document.getElementById('timer-display').innerText = `â± ${state.timer.toFixed(1)}s`;
+                if(state.timer < 5) {
+                    document.getElementById('timer-display').classList.add('text-red-500', 'animate-pulse');
+                }
+            }, 100);
+        }
+
+        function handleTimeOut() {
+            playSFX('wrong');
+            state.trust = Math.max(0, state.trust - 10);
+            showFloatingText("Too Slow! Trust -10", "text-red-400");
+            updateUI();
+            
+            // Auto select a random wrong answer (simulate panicking)
+            const stageKey = Object.keys(gameData[state.currentQuestionIndex].stages)[state.currentStageIndex];
+            const options = gameData[state.currentQuestionIndex].stages[stageKey];
+            const wrongOpt = options.find(o => !o.isCorrect);
+            processAnswer(wrongOpt);
+        }
+
+        function renderOptions() {
+            const q = gameData[state.currentQuestionIndex];
+            const stageKey = Object.keys(q.stages)[state.currentStageIndex];
+            const options = q.stages[stageKey];
+            
+            document.getElementById('current-stage-indicator').innerText = `Step ${state.currentStageIndex + 1}: ${stageNames[state.currentStageIndex]}`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            // Randomize order
+            const shuffledOptions = [...options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-3 rounded-xl bg-gray-700/50 hover:bg-gray-600 border border-gray-600 text-sm transition text-gray-200 active:bg-gray-500';
+                btn.innerText = opt.text;
+                btn.onclick = () => {
+                    clearInterval(state.timerInterval);
+                    processAnswer(opt);
+                };
+                container.appendChild(btn);
+            });
+
+            startTimer();
+        }
+
+        function showFloatingText(text, colorClass) {
+            const appContainer = document.getElementById('app-container');
+            const floater = document.createElement('div');
+            floater.className = `absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-black ${colorClass} z-50 pointer-events-none drop-shadow-lg`;
+            floater.innerText = text;
+            floater.style.animation = 'slideUp 1s ease-out forwards';
+            appContainer.appendChild(floater);
+            setTimeout(() => floater.remove(), 1000);
+        }
+
+        function triggerBannedAlert() {
+            playSFX('banned');
+            const alert = document.getElementById('banned-word-alert');
+            const container = document.getElementById('app-container');
+            container.classList.add('animate-shake', 'border-4', 'border-red-500');
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+                container.classList.remove('animate-shake', 'border-4', 'border-red-500');
+            }, 800);
+        }
+
+        function processAnswer(selectedOption) {
+            const q = gameData[state.currentQuestionIndex];
+            const stageKey = Object.keys(q.stages)[state.currentStageIndex];
+            
+            // Record answer
+            if(!state.answersRecord[state.currentQuestionIndex]) {
+                state.answersRecord[state.currentQuestionIndex] = {
+                    qNum: state.currentQuestionIndex + 1,
+                    scenario: q.message,
+                    picks: []
+                };
+            }
+            
+            state.answersRecord[state.currentQuestionIndex].picks.push({
+                stage: stageNames[state.currentStageIndex],
+                text: selectedOption.text,
+                isCorrect: selectedOption.isCorrect,
+                type: selectedOption.type
+            });
+
+            appendMessage("You", "Bridge", "", selectedOption.text, 'outgoing');
+
+            if (selectedOption.isCorrect) {
+                playSFX('correct');
+                let timeBonus = Math.floor(state.timer * 10);
+                let points = 100 + timeBonus;
+                state.score += points;
+                showFloatingText(`+${points}`, 'text-green-400');
+            } else {
+                if(selectedOption.type === 'banned_word' || selectedOption.type === 'bureaucratic') {
+                    triggerBannedAlert();
+                    state.trust = Math.max(0, state.trust - 25);
+                } else {
+                    playSFX('wrong');
+                    state.trust = Math.max(0, state.trust - 15);
+                    showFloatingText("-15 Trust", 'text-yellow-500');
+                }
+            }
+
+            updateUI();
+
+            if (state.trust <= 0) {
+                setTimeout(() => endGame(false), 1000);
+                return;
+            }
+
+            document.getElementById('options-container').innerHTML = '<div class="text-center text-gray-500 text-xs py-2 animate-pulse">Processing...</div>';
+
+            setTimeout(() => {
+                state.currentStageIndex++;
+                if (state.currentStageIndex < 3) {
+                    renderOptions();
+                } else {
+                    // Next Question Delay
+                    document.getElementById('current-stage-indicator').innerText = "Resolution Sent.";
+                    document.getElementById('options-container').innerHTML = '';
+                    state.currentQuestionIndex++;
+                    setTimeout(() => renderQuestion(), 1500);
+                }
+            }, 800);
+        }
+
+        function endGame(isWin) {
+            clearInterval(state.timerInterval);
+            toggleBGM(false);
+            switchScreen('result');
+            
+            const title = document.getElementById('result-title');
+            const subtitle = document.getElementById('result-subtitle');
+            const icon = document.getElementById('result-icon');
+            
+            document.getElementById('result-score').innerText = state.score;
+            document.getElementById('result-trust').innerText = `${state.trust}%`;
+            
+            if(isWin) {
+                playSFX('correct'); // Replace with win sound logic if advanced
+                title.innerText = "MISSION COMPLETE";
+                title.className = "text-3xl font-black font-poppins uppercase tracking-wider text-green-400";
+                subtitle.innerText = "Luar biasa! Anda berhasil menjadi 'Jembatan Alternatif' yang solid untuk seluruh divisi.";
+                icon.innerText = "ðŸ†";
+                icon.className = "w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl mb-4 bg-green-900/50 border-4 border-green-500";
+            } else {
+                playSFX('banned');
+                title.innerText = "MISSION FAILED";
+                title.className = "text-3xl font-black font-poppins uppercase tracking-wider text-red-500";
+                subtitle.innerText = "Trust habis. Anda menjadi 'Tembok Birokrasi' dan komunikasi antar divisi terputus.";
+                icon.innerText = "ðŸ§±";
+                icon.className = "w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl mb-4 bg-red-900/50 border-4 border-red-500 animate-shake";
+            }
+
+            renderDebrief();
+        }
+
+        function renderDebrief() {
+            const list = document.getElementById('debrief-list');
+            list.innerHTML = '';
+
+            state.answersRecord.forEach(rec => {
+                let errCount = rec.picks.filter(p => !p.isCorrect).length;
+                let bgClass = errCount === 0 ? 'bg-green-900/20 border-green-700/50' : (errCount === 3 ? 'bg-red-900/20 border-red-700/50' : 'bg-yellow-900/20 border-yellow-700/50');
+                let statusIcon = errCount === 0 ? 'âœ…' : 'âš ï¸';
+
+                let picksHtml = rec.picks.map(p => {
+                    let color = p.isCorrect ? 'text-green-400' : 'text-red-400';
+                    let label = p.isCorrect ? 'Tepat' : 'Birokratis';
+                    return `<div class="mb-1 border-l-2 ${p.isCorrect ? 'border-green-500' : 'border-red-500'} pl-2">
+                                <div class="text-[10px] uppercase text-gray-500 font-bold">${p.stage} - <span class="${color}">${label}</span></div>
+                                <div class="text-xs text-gray-300 italic">"${p.text}"</div>
+                            </div>`;
+                }).join('');
+
+                const html = `
+                    <div class="p-3 rounded-lg border ${bgClass}">
+                        <div class="font-bold text-sm mb-1 text-gray-200">${statusIcon} Kasus ${rec.qNum}</div>
+                        <div class="text-xs text-gray-400 mb-2 truncate">${rec.scenario}</div>
+                        ${picksHtml}
+                    </div>
+                `;
+                list.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        document.getElementById('btn-restart').addEventListener('click', () => {
+            playSFX('click');
+            switchScreen('gateway');
+        });
+
     </script>
 </body>
 </html>
