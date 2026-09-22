@@ -910,14 +910,14 @@
                 title.innerText = "MISSION COMPLETE";
                 title.className = "text-3xl font-black font-poppins uppercase tracking-wider text-green-400";
                 subtitle.innerText = "Luar biasa! Anda berhasil menjadi 'Jembatan Alternatif' yang solid untuk seluruh divisi.";
-                icon.innerText = "ðŸ†";
+                icon.innerText = "";
                 icon.className = "w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl mb-4 bg-green-900/50 border-4 border-green-500";
             } else {
                 playSFX('banned');
                 title.innerText = "MISSION FAILED";
                 title.className = "text-3xl font-black font-poppins uppercase tracking-wider text-red-500";
                 subtitle.innerText = "Trust habis. Anda menjadi 'Tembok Birokrasi' dan komunikasi antar divisi terputus.";
-                icon.innerText = "ðŸ§±";
+                icon.innerText = "";
                 icon.className = "w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl mb-4 bg-red-900/50 border-4 border-red-500 animate-shake";
             }
 
@@ -931,7 +931,7 @@
             state.answersRecord.forEach(rec => {
                 let errCount = rec.picks.filter(p => !p.isCorrect).length;
                 let bgClass = errCount === 0 ? 'bg-green-900/20 border-green-700/50' : (errCount === 3 ? 'bg-red-900/20 border-red-700/50' : 'bg-yellow-900/20 border-yellow-700/50');
-                let statusIcon = errCount === 0 ? 'âœ…' : 'âš ï¸';
+                let statusIcon = errCount === 0 ?;
 
                 let picksHtml = rec.picks.map(p => {
                     let color = p.isCorrect ? 'text-green-400' : 'text-red-400';
